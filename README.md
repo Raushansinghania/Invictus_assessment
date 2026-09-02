@@ -1,51 +1,378 @@
-# FairShare
+# FairShare 💸
 
-FairShare helps a group of friends share costs on a trip.
+> **Bug Fixing & Improvement Assignment**
 
-Imagine four people on a weekend away. Someone pays for dinner, someone else pays for the cab, someone books the stay. Instead of arguing in a chat thread, they log each expense here: who paid, how much, and who should share it. The app then shows who is in credit, who still needs to pay in, and a simple list of transfers that would settle the group.
+FairShare is a web application for managing and splitting shared expenses among a group of people.
 
-This repo is a working app, not a starter template. Get it running, use it the way a traveler would, and read the code when something does not add up. Improve **this** project. Do not start over or add new libraries.
+It is designed for situations such as trips, vacations, dinners, or group activities where different people pay for different expenses. The application keeps track of **who paid, who participated in an expense, how much each person owes, and how the group can settle its final balances**.
 
-## How bill splitting should work
+This repository contains my **completed bug-fixing and improvement work** on the provided FairShare application.
 
-FairShare is meant to match how people actually split money in real life.
+---
 
-**Recording a bill.** Each expense is one real payment: a description, an amount, who paid the merchant, and who that cost is for. The payer is the person whose card or cash went out. The split is the people who should carry that cost.
+## 📌 Assignment Overview
 
-**Equal split.** If three people share a dinner equally, each of them is on the hook for the same portion of that dinner. Those portions together should make up the full bill — the group should not “lose” or “invent” money in the rounding.
+The objective of this assignment was to:
 
-**Uneven split.** Sometimes one person had the expensive dish, or only two of the four used the cab. Custom percentages are for that. The percentages are just a way of describing the split; in dollars, the shares should still cover the original amount.
+* Understand the existing FairShare application.
+* Run and test the application using realistic scenarios.
+* Identify bugs and incorrect behavior.
+* Fix the issues without rebuilding the application from scratch.
+* Preserve the existing functionality while improving its reliability.
+* Document the discovered bugs and their resolutions in `BUGS.md`.
 
-**Paying for other people.** It is normal that the person who paid is not on the split. Someone can put a cab on their card even if they did not ride. They should get that fare back in full. Only the people who used it should owe a share. Anyone who was not involved should be left out of that bill.
+The application was tested from the perspective of a real user managing expenses during a group trip.
 
-**Running balance.** Over the whole trip, each person’s position is simple: add up what they paid out, subtract what they actually consumed (their share of each bill they were on). If they have paid more than their share, the group owes them. If they have paid less, they still owe the group. Across everyone, those positions should cancel out — this is a closed group, not a bank.
+---
 
-**Settling up.** The settle-up list is a shortcut so people do not have to ping each other one expense at a time. After those suggested payments, nobody should still be in credit or in debt.
+## 💡 How FairShare Works
 
-**Using the app.** Filters, edits, new people, and coming back later should not change the story of an expense. What you click is what should change. What the screen claims (who paid, who owes whom, which bills you are looking at) should match the data.
+Every expense contains four important pieces of information:
 
-The demo group is a weekend in Goa with a handful of bills already logged. Use those, and add your own, to see whether the app behaves as above.
+| Information      | Description                           |
+| ---------------- | ------------------------------------- |
+| **Description**  | What the expense was for              |
+| **Amount**       | Total amount paid                     |
+| **Payer**        | Person who actually paid the merchant |
+| **Participants** | People who should share the expense   |
 
-## Run it
+For example, if one person pays ₹1,200 for a cab used by three other people, the payer and the participants can be different.
 
+FairShare should correctly represent that relationship rather than assuming that the person who paid must also be part of the split.
 
-You need Node.js 18 or newer.
+---
+
+## ⚖️ Expense Splitting
+
+### Equal Split
+
+If three people share a ₹900 dinner equally:
+
+```text
+₹900 ÷ 3 = ₹300 per person
+```
+
+The individual shares must add up to exactly:
+
+```text
+₹300 + ₹300 + ₹300 = ₹900
+```
+
+The application should avoid losing or creating money because of rounding.
+
+### Uneven Split
+
+Some expenses are not shared equally.
+
+For example:
+
+```text
+Total Expense = ₹1,000
+
+Person A = 50%
+Person B = 30%
+Person C = 20%
+```
+
+The resulting shares are:
+
+```text
+Person A = ₹500
+Person B = ₹300
+Person C = ₹200
+```
+
+Total:
+
+```text
+₹500 + ₹300 + ₹200 = ₹1,000
+```
+
+---
+
+## 💳 Payer vs. Participants
+
+The person who pays an expense does not necessarily have to be one of the participants.
+
+Example:
+
+> Aman pays ₹1,200 for a cab that was used by Rahul, Rohit, and Priya.
+
+The correct interpretation is:
+
+```text
+Payer:
+Aman → ₹1,200
+
+Participants:
+Rahul
+Rohit
+Priya
+```
+
+Aman should receive the appropriate reimbursement, while people who did not use the cab should not be charged.
+
+---
+
+## 📊 Running Balance
+
+FairShare calculates each person's overall position across all expenses.
+
+The basic calculation is:
+
+```text
+Balance = Total Paid − Total Personal Share
+```
+
+### Positive Balance
+
+A positive balance means the person has paid more than their share.
+
+```text
++₹600
+```
+
+The group owes this person ₹600.
+
+### Negative Balance
+
+A negative balance means the person has paid less than their share.
+
+```text
+-₹300
+```
+
+The person needs to pay ₹300.
+
+### Zero Balance
+
+```text
+₹0
+```
+
+The person's expenses are completely settled.
+
+For a closed group, the balances should always satisfy:
+
+```text
+Sum of all balances = ₹0
+```
+
+---
+
+## 🤝 Settle Up
+
+The settle-up functionality converts the final balances into suggested payments.
+
+For example:
+
+```text
+Aman   +₹600
+Rahul  -₹300
+Rohit  -₹300
+```
+
+A possible settlement is:
+
+```text
+Rahul → Aman : ₹300
+Rohit → Aman : ₹300
+```
+
+After these transfers:
+
+```text
+Aman   ₹0
+Rahul  ₹0
+Rohit  ₹0
+```
+
+Everyone is settled.
+
+---
+
+# 🐛 Bugs Identified & Fixed
+
+All identified issues and their resolutions are documented in:
+
+**`BUGS.md`**
+
+The bug-fixing process focused on areas such as:
+
+* Expense calculations
+* Equal splitting
+* Percentage-based splitting
+* Rounding
+* Payer and participant relationships
+* Running balances
+* Settle-up calculations
+* Adding and editing expenses
+* Adding people
+* Expense filtering
+* Data persistence
+* UI state consistency
+
+Each issue was investigated using actual application behavior before implementing the fix.
+
+---
+
+## 🧪 Testing Approach
+
+The application was tested using different realistic expense scenarios rather than relying only on the existing demo data.
+
+Examples included:
+
+### Scenario 1 — Equal Expense
+
+```text
+₹900 dinner
+3 participants
+Equal split
+```
+
+### Scenario 2 — Uneven Expense
+
+```text
+₹1,000 expense
+50% / 30% / 20% split
+```
+
+### Scenario 3 — Payer Not Included
+
+```text
+₹1,200 cab
+1 payer
+3 participants
+```
+
+### Scenario 4 — Multiple Expenses
+
+Several people pay for different expenses across the same trip to verify that the final balances remain consistent.
+
+### Scenario 5 — Persistence
+
+Expenses and changes were checked after refreshing the application to ensure that the displayed information remained consistent with the stored data.
+
+---
+
+# 🛠️ Tech Stack
+
+The project uses the technology stack provided with the original application.
+
+* **JavaScript / TypeScript**
+* **Web application frontend**
+* **Browser Local Storage**
+* **Node.js**
+* **npm**
+* **Git / GitHub**
+
+> No additional libraries were introduced as part of the assignment.
+
+---
+
+# 🚀 Running the Project
+
+### Prerequisites
+
+You need:
+
+* **Node.js 18 or newer**
+* **npm**
+
+Check your Node.js version:
+
+```bash
+node --version
+```
+
+### Installation
+
+Clone the repository:
+
+```bash
+git clone <YOUR-REPOSITORY-URL>
+```
+
+Navigate to the project:
+
+```bash
+cd <PROJECT-DIRECTORY>
+```
+
+Install dependencies:
 
 ```bash
 npm install
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-Then open the local URL (usually `http://localhost:5173`).
+Open the local URL provided by the terminal.
 
-The demo group is stored in your browser. If you want the original demo data back, delete `fairshare-v1` under DevTools → Application → Local Storage, and refresh.
+Usually:
 
-## What we want from you
+```text
+http://localhost:5173
+```
 
-Find problems, fix them, and record them in `BUGS.md` (this file is already in the repo). Commit `BUGS.md` together with your code changes.
+---
 
-## How to submit
+# 💾 Restoring Demo Data
 
-1. Create a **new public repository** on your GitHub account (do not fork an existing private company repo).
-2. Push your work there, including your filled-in `BUGS.md`.
-3. Send us the repository URL.
+The demo group is stored in the browser's Local Storage.
+
+To restore the original demo data:
+
+1. Open **Developer Tools**.
+2. Go to **Application**.
+3. Open **Local Storage**.
+4. Locate `fairshare-v1`.
+5. Delete the entry.
+6. Refresh the page.
+
+The original demo data will be recreated.
+
+---
+
+# 📁 Project Documentation
+
+| File         | Purpose                               |
+| ------------ | ------------------------------------- |
+| `README.md`  | Project and assignment overview       |
+| `BUGS.md`    | Bugs identified and fixes implemented |
+| Source files | Application implementation            |
+
+---
+
+# 🎯 Assignment Outcome
+
+Through this assignment, I worked on an existing codebase rather than creating a new application from scratch.
+
+The main focus was on:
+
+* Understanding existing code
+* Debugging
+* Tracing incorrect calculations
+* Handling edge cases
+* Maintaining data consistency
+* Testing user workflows
+* Making targeted code changes
+* Documenting bugs and fixes
+
+The completed repository contains both the **application improvements** and the corresponding **bug documentation in `BUGS.md`**.
+
+---
+
+## 👨‍💻 Submission
+
+This repository represents my completed FairShare bug-fixing assignment, including:
+
+* ✅ Fixed application issues
+* ✅ Tested expense and settlement workflows
+* ✅ Updated `BUGS.md`
+* ✅ Preserved the existing application structure
+* ✅ No unnecessary dependencies added
