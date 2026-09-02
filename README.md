@@ -316,7 +316,7 @@ Open the local URL provided by the terminal.
 Usually:
 
 ```text
-http://localhost:5173
+https://invictus-assessment.vercel.app/
 ```
 
 ---
